@@ -11,6 +11,7 @@ var remoteDir = "../sync_remote";
 
 getDiff()
     .then(function (diffFiles) {
+        console.log(diffFiles);
         return Promise.all(diffFiles.map(function (src) {
            return upload(src, path.resolve(remoteDir, src));
         }));
