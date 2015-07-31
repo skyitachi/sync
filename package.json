@@ -1,0 +1,11 @@
+{
+  "name": "sync",
+  "version": "0.0.1",
+  "scripts": {
+    "server": "export NODE_ENV=test && node --harmony server.js",
+    "client": "export NODE_ENV=test && node --harmony client.js"
+  },
+  "dependencies": {
+    "promise": "^7.0.3"
+  }
+}
