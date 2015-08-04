@@ -54,7 +54,7 @@ function deleteContent(pathname) {
     respond(res, 200, "OK");
 }
 
-function respond(res, msg, statusCode) {
+function respond(res, statusCode, msg) {
     res.writeHead(statusCode, HTTPStatus[statusCode]);
     res.write(new Buffer(msg));
     res.end();
