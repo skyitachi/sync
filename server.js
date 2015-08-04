@@ -47,9 +47,9 @@ http.createServer(function (req, res) {
         var offset = data.readUIntLE(0, 2);
         var pathName = data.slice(2, 2 + offset).toString();
         switch(params.status) {
-            case 'M': modifyContent(pathname, data.slice(2 + offset));break;
-            case 'A': addContent(pathname, data.slice(2 + offset));break;
-            case 'D': deleteContent(pathname);break;
+            case 'M': modifyContent(pathName, data.slice(2 + offset));break;
+            case 'A': addContent(pathName, data.slice(2 + offset));break;
+            case 'D': deleteContent(pathName);break;
         }
         res.writeHead(200, "OK");
         res.end();
