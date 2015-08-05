@@ -11,6 +11,7 @@
   "dependencies": {
     "commander": "^2.8.1",
     "http-status": "^0.2.0",
+    "object-assign": "^3.0.0",
     "promise": "^7.0.3"
   }
 }

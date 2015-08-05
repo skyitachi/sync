@@ -1,18 +1,30 @@
 var http = require("http");
 var fs = require("fs");
 var path = require("path");
-var execSync = require("child_process").execSync;
+var execSyncSafe = require("./lib/execSyncSafe.js");
 var HTTPStatus = require("http-status");
+var util = require("util");
+var getRequestBody = require("./lib/getRequestBody.js");
 
-function parseUrl(url) {
-    var matches = /^\/node\/(\d+)\/([M,A,D])\/?$/.exec(url);
+var debug = require("debug")("server");
+
+function parseSyncUrl(url, callback) {
+    var matches = /^\/node\/sync\/(\d+)\/([M,A,D])\/?$/.exec(url);
     if (matches) {
         return {
             offset: +matches[1],
             status: matches[2]
         }    
     }
-    return {};
+    return;
+}
+
+function parseUpdateUrl(url, callback) {
+    var matches = /^\/node\/update\/?$/.exec(url);
+    if (matches) {
+        return true;
+    }
+    return false;
 }
 
 function modifyContent(res, pathname, content) {
@@ -26,14 +38,14 @@ function modifyContent(res, pathname, content) {
     respond(res, 200, "OK");
 }
 
-function addContent(pathname, content) {
+function addContent(res, pathname, content) {
     var dirname = path.dirname(pathname);
     try {
         if (fs.existsSync(dirname)) {
             fs.writeFileSync(pathname, content);
         } else {
-            fs.mkdirSync(dirname, "0664");
-            fs.writeFileSync(pathname, content)
+            fs.mkdirSync(dirname, "0755");
+            fs.writeFileSync(pathname, content);
         }
     } catch(e) {
         var error = parseError(e);
@@ -43,7 +55,7 @@ function addContent(pathname, content) {
     respond(res, 200, "OK");
 }
 
-function deleteContent(pathname) {
+function deleteContent(res, pathname) {
     try {
         fs.unlinkSync(pathname); 
     } catch (e) {
@@ -80,18 +92,28 @@ function parseError(error) {
     };
 }
 
-http.createServer(function (req, res) {
-    var data = [];
-    var params = parseUrl(req.url);
-    if (!params.offset) {
-        respond(res, 400, "url wrong");
-        return;
-    }
-    req.on("data", function (chunk) {
-        data.push(chunk);
+
+function updateRepo(req, res) {
+    if (!parseUpdateUrl(req.url)) return Promise.resolve("unhandled");
+    var cmd = "rsync -a %s %s";
+    return getRequestBody(req).then(function (data) {
+        data = JSON.parse(data.toString());
+        try {
+            execSyncSafe(util.format(cmd, data.srcDir, data.dstDir));
+            respond(res, 200, "OK");
+        } catch (e) {
+            respond(res, 500, e.message);
+        }
+        return Promise.resolve("handled");
     });
-    req.on("end", function () {
-        data = Buffer.concat(data);
+}
+
+function syncRepo(req, res) {
+    var params = parseSyncUrl(req.url);
+    if (!params) {
+        return Promise.resolve("unhandled");
+    }
+    return getRequestBody(req).then(function (data) {
         var offset = data.readUIntLE(0, 2);
         var pathName = data.slice(2, 2 + offset).toString();
         switch(params.status) {
@@ -99,6 +121,20 @@ http.createServer(function (req, res) {
             case 'A': addContent(res, pathName, data.slice(2 + offset));break;
             case 'D': deleteContent(res, pathName);break;
         }
-    })
+        return Promise.resolve("handled");
+    });
+}
 
+function chainHandle(req, res, queue) {
+    Promise.all(queue.map(function (handler) {return handler(req, res);}))
+        .then(function (msgs) {
+            var unhandled = msgs.every(function (msg) {return msg === "unhandled";});
+            if (unhandled) {
+                respond(res, 400, "wrong url");
+            }
+        });
+}
+
+http.createServer(function (req, res) {
+    chainHandle(req, res, [syncRepo, updateRepo]);
 }).listen(18088, '127.0.0.1');
