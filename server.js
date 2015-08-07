@@ -53,14 +53,11 @@ function addContent(res, pathname, content) {
 }
 
 function deleteContent(res, pathname) {
-    try {
-        fs.unlinkSync(pathname); 
-    } catch (e) {
-        var error = parseError(e);
-        respond(res, error.code, error.msg);        
-        return;
-    }
+  try {
+    fs.unlinkSync(pathname);
+  } finally {
     respond(res, 200, "OK");
+  }
 }
 
 function respond(res, statusCode, msg) {
