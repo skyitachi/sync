@@ -8,23 +8,20 @@ var getRequestBody = require("./lib/getRequestBody.js");
 
 var debug = require("debug")("server");
 
-function parseSyncUrl(url, callback) {
-    var matches = /^\/node\/sync\/(\d+)\/([M,A,D])\/?$/.exec(url);
+function parseSyncUrl(url) {
+    var matches = /^\/node\/sync\/(\d+)\/([MAD])\/?$/.exec(url);
     if (matches) {
         return {
             offset: +matches[1],
             status: matches[2]
         }    
     }
-    return;
+    return false;
 }
 
-function parseUpdateUrl(url, callback) {
+function parseUpdateUrl(url) {
     var matches = /^\/node\/update\/?$/.exec(url);
-    if (matches) {
-        return true;
-    }
-    return false;
+    return matches ? true : false;
 }
 
 function modifyContent(res, pathname, content) {
@@ -39,12 +36,12 @@ function modifyContent(res, pathname, content) {
 }
 
 function addContent(res, pathname, content) {
-    var dirname = path.dirname(pathname);
+    var dirName = path.dirname(pathname);
     try {
-        if (fs.existsSync(dirname)) {
+        if (fs.existsSync(dirName)) {
             fs.writeFileSync(pathname, content);
         } else {
-            fs.mkdirSync(dirname, "0755");
+            fs.mkdirSync(dirName, "0755");
             fs.writeFileSync(pathname, content);
         }
     } catch(e) {
@@ -77,8 +74,8 @@ function parseError(error) {
     var re = /(EACCES|ENOENT)/;
     var codeMap = {
         "EACCES": 403,
-        "ENOENT": 503,
-    }
+        "ENOENT": 503
+    };
     var matches = re.exec(msg);
     if (!matches) {
         return {
@@ -91,7 +88,6 @@ function parseError(error) {
         code: codeMap[matches[1]]
     };
 }
-
 
 function updateRepo(req, res) {
     if (!parseUpdateUrl(req.url)) return Promise.resolve("unhandled");
