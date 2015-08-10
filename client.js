@@ -16,6 +16,7 @@ program
 //global variables
 
 var remoteDir = program.remote || config.remoteDir;
+
 if (program.update) {
   update({
     remoteDir: remoteDir
@@ -25,3 +26,4 @@ if (program.update) {
     remoteDir: remoteDir
   });
 }
+

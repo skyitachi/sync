@@ -9,6 +9,7 @@
     "client": "export NODE_ENV=test && node --harmony client.js"
   },
   "dependencies": {
+    "chalk": "^1.1.0",
     "commander": "^2.8.1",
     "http-status": "^0.2.0",
     "object-assign": "^3.0.0",

@@ -28,11 +28,11 @@ function modifyContent(res, pathname, content) {
     try {
         fs.writeFileSync(pathname, content);
     } catch (e) {
-        var error = parseError(e);
-        respond(res, error.code, error.msg);        
-        return;
+      var error = parseError(e);
+      respond(res, error.code, {status: 0, msg: error.msg});
+      return;
     }
-    respond(res, 200, "OK");
+  respond(res, 200, {status: 1, msg: "ok"});
 }
 
 function addContent(res, pathname, content) {
@@ -46,23 +46,25 @@ function addContent(res, pathname, content) {
         }
     } catch(e) {
         var error = parseError(e);
-        respond(res, error.code, error.msg);        
+        respond(res, error.code, {status: 0, msg: error.msg});
         return;
     }
-    respond(res, 200, "OK");
+  respond(res, 200, {status: 1, msg: "ok"});
+
+
 }
 
 function deleteContent(res, pathname) {
   try {
     fs.unlinkSync(pathname);
   } finally {
-    respond(res, 200, "OK");
+    respond(res, 200, {status: 1, msg: "ok"});
   }
 }
 
-function respond(res, statusCode, msg) {
+function respond(res, statusCode, resData) {
     res.writeHead(statusCode, HTTPStatus[statusCode]);
-    res.write(new Buffer(msg));
+    res.write(new Buffer(JSON.stringify(resData)));
     res.end();
 }
 
@@ -93,9 +95,9 @@ function updateRepo(req, res) {
         data = JSON.parse(data.toString());
         try {
             execSyncSafe(util.format(cmd, data.srcDir, data.dstDir));
-            respond(res, 200, "OK");
-        } catch (e) {
-            respond(res, 500, e.message);
+          respond(res, 200, {status: 1, msg: "ok"});
+        } catch (error) {
+          respond(res, error.code, {status: 0, msg: error.msg});
         }
         return Promise.resolve("handled");
     });
@@ -123,7 +125,7 @@ function chainHandle(req, res, queue) {
         .then(function (msgs) {
             var unhandled = msgs.every(function (msg) {return msg === "unhandled";});
             if (unhandled) {
-                respond(res, 400, "wrong url");
+                respond(res, 400, {status: 0, msg: "wrong url"});
             }
         });
 }
