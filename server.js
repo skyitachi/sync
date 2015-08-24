@@ -29,10 +29,10 @@ function modifyContent(res, pathname, content) {
         fs.writeFileSync(pathname, content);
     } catch (e) {
       var error = parseError(e);
-      respond(res, error.code, {status: 0, msg: error.msg});
+      respond(res, error.code, {status: 0, msg: error.msg, file: pathname});
       return;
     }
-  respond(res, 200, {status: 1, msg: "ok"});
+  respond(res, 200, {status: 1, msg: "ok", file:pathname});
 }
 
 function addContent(res, pathname, content) {
@@ -46,11 +46,10 @@ function addContent(res, pathname, content) {
         }
     } catch(e) {
         var error = parseError(e);
-        respond(res, error.code, {status: 0, msg: error.msg});
+        respond(res, error.code, {status: 0, msg: error.msg, file: pathname});
         return;
     }
-  respond(res, 200, {status: 1, msg: "ok"});
-
+  respond(res, 200, {status: 1, msg: "ok", file: pathname});
 
 }
 
@@ -58,7 +57,7 @@ function deleteContent(res, pathname) {
   try {
     fs.unlinkSync(pathname);
   } finally {
-    respond(res, 200, {status: 1, msg: "ok"});
+    respond(res, 200, {status: 1, msg: "ok", file: pathname});
   }
 }
 

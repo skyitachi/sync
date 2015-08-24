@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+process.env.DEBUG = "sync";
 var config = require("./config.json");
 var program = require("commander");
 var pkg = require("./package.json");

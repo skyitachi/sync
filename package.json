@@ -11,8 +11,10 @@
   "dependencies": {
     "chalk": "^1.1.0",
     "commander": "^2.8.1",
+    "debug": "^2.2.0",
     "http-status": "^0.2.0",
     "object-assign": "^3.0.0",
-    "promise": "^7.0.3"
+    "promise": "^7.0.3",
+    "text-table": "^0.2.0"
   }
 }
