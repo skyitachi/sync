@@ -36,18 +36,17 @@ function modifyContent(res, pathname, content) {
 }
 
 function addContent(res, pathname, content) {
-    var dirName = path.dirname(pathname);
+  var dirName = path.dirname(pathname);
     try {
-        if (fs.existsSync(dirName)) {
-            fs.writeFileSync(pathname, content);
-        } else {
-            fs.mkdirSync(dirName, "0755");
-            fs.writeFileSync(pathname, content);
-        }
+      if (!fs.existsSync(dirName)) {
+        fs.mkdirSync(dirName, "0777");
+      }
+      fs.chmodSync(pathname, "0777");
+      fs.writeFileSync(pathname, content);
     } catch(e) {
-        var error = parseError(e);
-        respond(res, error.code, {status: 0, msg: error.msg, file: pathname});
-        return;
+      var error = parseError(e);
+      respond(res, error.code, {status: 0, msg: error.msg, file: pathname});
+      return;
     }
   respond(res, 200, {status: 1, msg: "ok", file: pathname});
 
