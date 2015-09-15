@@ -6,7 +6,8 @@
   },
   "scripts": {
     "server": "export NODE_ENV=test && node --harmony server.js",
-    "client": "export NODE_ENV=test && node --harmony client.js"
+    "client": "export NODE_ENV=test && node --harmony client.js",
+    "postinstall": "mkdir ~/.sync && cp ./config.json ~/.sync/config.json"
   },
   "dependencies": {
     "chalk": "^1.1.0",

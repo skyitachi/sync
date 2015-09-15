@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 process.env.DEBUG = "sync";
+var fs = require("fs");
 var config = require("./config.json");
+if (fs.existSync("~/.sync/config.json")) {
+  config = require("~/.sync/config.json");
+}
 var program = require("commander");
 var pkg = require("./package.json");
 var sync = require("./lib/sync.js");
