@@ -41,8 +41,8 @@ function addContent(res, pathname, content) {
       if (!fs.existsSync(dirName)) {
         fs.mkdirSync(dirName, "0777");
       }
-      fs.chmodSync(pathname, "0777");
       fs.writeFileSync(pathname, content);
+      fs.chmodSync(pathname, "0777");
     } catch(e) {
       var error = parseError(e);
       respond(res, error.code, {status: 0, msg: error.msg, file: pathname});
