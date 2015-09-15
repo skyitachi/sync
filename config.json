@@ -5,5 +5,6 @@
   "method": "post",
   "username": "xxxx",
   "remoteDir": "/Users/skyitachi/lab/sankuai/sync_remote",
-  "srcDir": "/Users/skyitachi/lab/sankuai/sync"
+  "srcDir": "/Users/skyitachi/lab/sankuai/sync",
+  "beforeCommit": true
 }

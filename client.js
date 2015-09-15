@@ -23,7 +23,8 @@ if (program.update) {
   });
 } else {
   sync({
-    remoteDir: remoteDir
+    remoteDir: remoteDir,
+    beforeCommit: true
   });
 }
 
