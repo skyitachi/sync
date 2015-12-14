@@ -1,5 +1,5 @@
 {
-  "name": "sync",
+  "name": "sync2st",
   "version": "0.0.5",
   "bin": {
     "sync2st": "./client.js"
